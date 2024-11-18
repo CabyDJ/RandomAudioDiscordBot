@@ -14,14 +14,28 @@ module.exports = {
 		.setName('join')
 		.setDescription("Bot joins a server voice channel")
         .addChannelOption(option =>
-            option.setName('channel')
-                .setDescription('the channel to join')
+            option.setName('canal')
+                .setDescription('El canal de voz al que unirse')
                 .setRequired(true)
-				.addChannelTypes(ChannelType.GuildVoice)),
+				.addChannelTypes(ChannelType.GuildVoice))
+		.addNumberOption(option =>
+			option.setName('minimo')
+				.setDescription('Tiempo minimo para el siguiente audio (en minutos)')
+                .setRequired(true)
+		)
+		.addNumberOption(option =>
+			option.setName('maximo')
+				.setDescription('Tiempo maximo para el siguiente audio (en minutos)')
+                .setRequired(true)
+		),
 	async execute(interaction) {
-		let channel = interaction.options.getChannel('channel');
-		
-		await interaction.reply(`Joined ${channel}`);
+		let channel = interaction.options.getChannel('canal');
+		minutesMin = MinutesToMiliseconds(interaction.options.getNumber('minimo'));
+		minutesMax = MinutesToMiliseconds(interaction.options.getNumber('maximo'));
+
+		console.log('Requested by user: ' + interaction.user.username);
+
+		await interaction.reply({ content: `Joined ${channel}`, ephemeral: true });
 
         const connection = joinVoiceChannel({
 			channelId: channel.id,
@@ -110,7 +124,7 @@ function PlaySoundAtTime(resource, channel){
 	});
 	
 	player.on(AudioPlayerStatus.Playing, (oldState, newState) => {
-		console.log('Audio player is in the Playing state!');
+		//console.log('Audio player is in the Playing state!');
 	});
 
 	// Subscribe the connection to the audio player (will play audio on the voice connection)
@@ -118,7 +132,7 @@ function PlaySoundAtTime(resource, channel){
 
 	 try{
 		 player.play(resource);
-		 console.log('resource played!');
+		 //console.log('resource played!');
 	 } catch (error) {
 		 console.log('error playing resource: ' + error);
 	 }
